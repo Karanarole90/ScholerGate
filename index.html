@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ScholarGate Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+/* ============ CSS VARIABLES ============ */
+:root {
+  --primary: #0f4c81;
+  --primary-light: #1b6fb5;
+  --accent: #f0a500;
+  --accent2: #e63946;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --nav-bg: #ffffff;
+  --nav-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  --border: #e2e8f0;
+  --input-bg: #f8fafc;
+  --glow: rgba(15,76,129,0.15);
+  --radius: 16px;
+  --transition: 0.3s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --primary: #38bdf8;
+  --primary-light: #7dd3fc;
+  --accent: #fbbf24;
+  --accent2: #f87171;
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --nav-bg: #1e293b;
+  --nav-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  --border: #334155;
+  --input-bg: #0f172a;
+  --glow: rgba(56,189,248,0.15);
+}
+
+/* ============ RESET & BASE ============ */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition: background var(--transition), color var(--transition);
+  overflow-x:hidden;
+}
+a { text-decoration:none; color:inherit; }
+ul { list-style:none; }
+img { max-width:100%; }
+button { cursor:pointer; border:none; background:none; font-family:inherit; }
+
+/* ============ NAVBAR ============ */
+#navbar {
+  position:fixed; top:0; left:0; width:100%; z-index:1000;
+  background:var(--nav-bg);
+  box-shadow:var(--nav-shadow);
+  transition: background var(--transition), box-shadow var(--transition);
+  padding:0 24px;
+}
+.nav-inner {
+  max-width:1280px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  height:64px;
+}
+.logo {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.5rem;
+  color:var(--primary);
+}
+.logo i { font-size:1.6rem; color:var(--accent); }
+.logo span { color:var(--accent); }
+
+.nav-links { display:flex; align-items:center; gap:4px; }
+.nav-links a {
+  padding:8px 14px; border-radius:8px;
+  font-weight:500; font-size:0.88rem;
+  color:var(--text);
+  transition: background var(--transition), color var(--transition);
+  position:relative;
+}
+.nav-links a:hover, .nav-links a.active {
+  background:var(--glow); color:var(--primary);
+}
+.nav-links .btn-login {
+  background:var(--primary); color:#fff; padding:8px 18px; border-radius:8px;
+  font-weight:600; margin-left:8px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.nav-links .btn-login:hover { transform:translateY(-1px); box-shadow:0 4px 14px var(--glow); }
+
+/* Dark mode toggle */
+.dark-toggle {
+  width:50px; height:26px; border-radius:13px;
+  background:var(--border); position:relative;
+  transition: background var(--transition);
+  margin-left:12px;
+}
+.dark-toggle.on { background:var(--primary-light); }
+.dark-toggle .knob {
+  position:absolute; top:3px; left:3px;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  transition: left var(--transition);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px;
+}
+.dark-toggle.on .knob { left:27px; }
+
+/* Mobile hamburger */
+.hamburger { display:none; flex-direction:column; gap:5px; padding:8px; }
+.hamburger span { display:block; width:24px; height:2px; background:var(--text); border-radius:2px; transition:var(--transition); }
+
+/* Mobile menu */
+.mobile-menu {
+  display:none; position:fixed; top:64px; left:0; width:100%;
+  background:var(--nav-bg); box-shadow:var(--nav-shadow);
+  padding:16px; z-index:999; flex-direction:column; gap:4px;
+}
+.mobile-menu.open { display:flex; }
+.mobile-menu a { padding:10px 16px; border-radius:8px; font-weight:500; color:var(--text); }
+.mobile-menu a:hover { background:var(--glow); color:var(--primary); }
+
+/* ============ PAGE SECTIONS (hidden by default) ============ */
+.page { display:none; min-height:100vh; padding-top:64px; animation:fadeIn .4s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ============ HERO ============ */
+.hero {
+  position:relative; min-height:calc(100vh - 64px);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  background:linear-gradient(135deg, var(--primary) 0%, #1a5276 40%, #0f3460 100%);
+}
+.hero-bg-shapes { position:absolute; inset:0; pointer-events:none; }
+.hero-bg-shapes .shape {
+  position:absolute; border-radius:50%;
+  background:rgba(255,255,255,0.04);
+}
+.shape-1 { width:500px;height:500px;top:-150px;right:-100px; }
+.shape-2 { width:300px;height:300px;bottom:-80px;left:-60px; background:rgba(240,165,0,0.06); }
+.shape-3 { width:180px;height:180px;top:40%;left:15%; background:rgba(255,255,255,0.03); }
+
+.hero-content {
+  position:relative; z-index:2;
+  text-align:center; padding:40px 24px; max-width:820px; margin:0 auto;
+}
+.hero-badge {
+  display:inline-block; background:rgba(240,165,0,0.18); color:var(--accent);
+  padding:6px 18px; border-radius:20px; font-size:0.82rem; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;
+  animation:pulse 2.5s infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(240,165,0,0.3)} 50%{box-shadow:0 0 0 8px transparent} }
+
+.hero h1 {
+  font-family:'Rajdhani',sans-serif; font-size:3.2rem; font-weight:700;
+  color:#fff; line-height:1.1; margin-bottom:16px;
+}
+.hero h1 span { color:var(--accent); }
+.hero p { color:rgba(255,255,255,0.75); font-size:1.05rem; max-width:560px; margin:0 auto 32px; line-height:1.6; }
+
+.hero-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.btn-primary {
+  background:var(--accent); color:#fff; padding:13px 32px; border-radius:10px;
+  font-weight:700; font-size:0.95rem; transition:transform var(--transition), box-shadow var(--transition);
+  box-shadow:0 4px 18px rgba(240,165,0,0.35);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(240,165,0,0.5); }
+.btn-secondary {
+  background:rgba(255,255,255,0.12); color:#fff; padding:13px 32px; border-radius:10px;
+  font-weight:600; font-size:0.95rem; border:1px solid rgba(255,255,255,0.25);
+  transition:background var(--transition);
+  backdrop-filter:blur(4px);
+}
+.btn-secondary:hover { background:rgba(255,255,255,0.22); }
+
+/* Hero stats strip */
+.hero-stats {
+  display:flex; gap:40px; justify-content:center; margin-top:56px; flex-wrap:wrap;
+}
+.hero-stat { text-align:center; }
+.hero-stat .num { font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; color:#fff; }
+.hero-stat .label { color:rgba(255,255,255,0.6); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; }
+
+/* ============ SECTION STYLES ============ */
+.section { padding:80px 24px; }
+.section-inner { max-width:1100px; margin:0 auto; }
+.section-title { text-align:center; margin-bottom:48px; }
+.section-title h2 {
+  font-family:'Rajdhani',sans-serif; font-size:2.2rem; font-weight:700; color:var(--primary); margin-bottom:8px;
+}
+.section-title p { color:var(--text-muted); max-width:560px; margin:0 auto; }
+.tag {
+  display:inline-block; background:var(--glow); color:var(--primary);
+  padding:4px 14px; border-radius:14px; font-size:0.78rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;
+}
+
+/* Cards grid */
+.card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; }
+.card {
+  background:var(--card-bg); border-radius:var(--radius); padding:32px 24px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+  transition: transform var(--transition), box-shadow var(--transition);
+  text-align:center;
+}
+.card:hover { transform:translateY(-4px); box-shadow:0 8px 32px var(--glow); }
+.card-icon {
+  width:60px; height:60px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 18px; font-size:1.5rem;
+}
+.card h3 { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--primary); }
+.card p { color:var(--text-muted); font-size:0.88rem; line-height:1.55; }
+
+/* ============ ABOUT PAGE ============ */
+.about-hero {
+  background:linear-gradient(135deg, var(--primary), #1a5276);
+  padding:72px 24px; text-align:center;
+}
+.about-hero h1 { font-family:'Rajdhani',sans-serif; font-size:2.6rem; color:#fff; font-weight:700; }
+.about-hero p { color:rgba(255,255,255,0.7); margin-top:10px; max-width:580px; margin-left:auto; margin-right:auto; }
+
+.about-content { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+.about-content .img-placeholder {
+  background:linear-gradient(135deg,var(--primary),#1a5276); border-radius:20px;
+  height:320px; display:flex; align-items:center; justify-content:center;
+  font-size:5rem; color:rgba(255,255,255,0.2);
+}
+.about-content .text h3 { font-family:'Rajdhani',sans-serif; font-size:1.7rem; color:var(--primary); margin-bottom:12px; }
+.about-content .text p { color:var(--text-muted); line-height:1.7; margin-bottom:12px; }
+.about-values { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
+.about-value { background:var(--card-bg); padding:18px; border-radius:12px; border:1px solid var(--border); }
+.about-value i { color:var(--accent); margin-right:8px; }
+.about-value span { font-weight:600; font-size:0.9rem; }
+
+/* ============ COMPETITION PAGE ============ */
+.comp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; margin-top:40px; }
+.comp-card {
+  background:var(--card-bg); border-radius:var(--radius); overflow:hidden;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+  transition:transform var(--transition);
+}
+.comp-card:hover { transform:translateY(-3px); }
+.comp-card-header {
+  background:linear-gradient(135deg,var(--primary),#1a5276);
+  padding:20px; text-align:center; color:#fff;
+}
+.comp-card-header h3 { font-family:'Rajdhani',sans-serif; font-size:1.3rem; }
+.comp-card-header .price { font-size:1.8rem; font-weight:700; color:var(--accent); }
+.comp-card-body { padding:22px; }
+.comp-card-body ul li { padding:7px 0; border-bottom:1px solid var(--border); color:var(--text-muted); font-size:0.9rem; }
+.comp-card-body ul li:last-child { border:none; }
+.comp-card-body ul li i { color:var(--accent); margin-right:8px; }
+
+.rules-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:36px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border); margin-top:48px;
+}
+.rules-box h3 { font-family:'Rajdhani',sans-serif; font-size:1.5rem; color:var(--primary); margin-bottom:16px; }
+.rules-box ol li { padding:8px 0; color:var(--text-muted); border-bottom:1px solid var(--border); }
+.rules-box ol li:last-child { border:none; }
+.rules-box ol li span { color:var(--primary); font-weight:700; margin-right:8px; }
+
+/* ============ RESULTS PAGE ============ */
+.result-container { max-width:560px; margin:60px auto; padding:0 20px; }
+.result-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:40px 32px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border); text-align:center;
+}
+.result-box h2 { font-family:'Rajdhani',sans-serif; font-size:1.8rem; color:var(--primary); margin-bottom:6px; }
+.result-box p { color:var(--text-muted); margin-bottom:24px; font-size:0.9rem; }
+.result-input {
+  width:100%; padding:14px 18px; border-radius:10px;
+  border:2px solid var(--border); background:var(--input-bg);
+  color:var(--text); font-size:1rem; font-family:inherit;
+  transition: border-color var(--transition);
+  text-align:center; letter-spacing:3px; font-weight:600;
+}
+.result-input:focus { outline:none; border-color:var(--primary); }
+.result-input::placeholder { color:var(--text-muted); letter-spacing:1px; font-weight:400; }
+.btn-get-result {
+  width:100%; margin-top:18px; padding:14px; border-radius:10px;
+  background:linear-gradient(135deg,var(--primary),#1a5276); color:#fff;
+  font-weight:700; font-size:1rem; font-family:inherit;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.btn-get-result:hover { transform:translateY(-2px); box-shadow:0 4px 18px var(--glow); }
+
+/* Result card shown after search */
+.result-card { display:none; margin-top:32px; text-align:left; animation:fadeIn .4s ease; }
+.result-card.show { display:block; }
+.result-card .student-info {
+  background:linear-gradient(135deg,var(--primary),#1a5276);
+  border-radius:14px; padding:22px; color:#fff; text-align:center; margin-bottom:18px;
+}
+.result-card .student-info .seat { font-size:0.82rem; opacity:.7; margin-bottom:4px; }
+.result-card .student-info h3 { font-family:'Rajdhani',sans-serif; font-size:1.5rem; }
+.result-card .student-info .school { font-size:0.88rem; opacity:.75; margin-top:4px; }
+
+.result-table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.result-table th {
+  background:var(--glow); padding:12px; text-align:left;
+  font-weight:600; font-size:0.82rem; text-transform:uppercase; color:var(--primary); letter-spacing:0.8px;
+}
+.result-table td { padding:13px; border-bottom:1px solid var(--border); color:var(--text); font-size:0.92rem; }
+.result-table tr:last-child td { border:none; }
+.result-table .label { color:var(--text-muted); font-weight:500; }
+.result-table .value { font-weight:700; color:var(--primary); }
+.result-table .rank-badge {
+  display:inline-block; background:linear-gradient(135deg,var(--accent),#f5c842);
+  color:#fff; padding:3px 12px; border-radius:20px; font-weight:700; font-size:0.9rem;
+}
+
+/* ============ LOGIN / STAFF LOGIN ============ */
+.login-wrap {
+  min-height:calc(100vh - 64px); display:flex; align-items:center; justify-content:center;
+  padding:40px 20px;
+}
+.login-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:44px 36px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+  width:100%; max-width:420px; animation:fadeIn .4s ease;
+}
+.login-box .login-icon {
+  width:72px; height:72px; border-radius:18px; margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--primary),#1a5276);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.8rem; color:#fff;
+}
+.login-box h2 { font-family:'Rajdhani',sans-serif; text-align:center; font-size:1.7rem; color:var(--primary); margin-bottom:4px; }
+.login-box .sub { text-align:center; color:var(--text-muted); font-size:0.87rem; margin-bottom:28px; }
+.input-group { margin-bottom:18px; }
+.input-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.8px; }
+.input-group input {
+  width:100%; padding:13px 16px; border-radius:10px;
+  border:2px solid var(--border); background:var(--input-bg);
+  color:var(--text); font-size:0.95rem; font-family:inherit;
+  transition:border-color var(--transition);
+}
+.input-group input:focus { outline:none; border-color:var(--primary); }
+.login-box .btn-login-submit {
+  width:100%; padding:14px; border-radius:10px;
+  background:linear-gradient(135deg,var(--primary),#1a5276); color:#fff;
+  font-weight:700; font-size:1rem; font-family:inherit; margin-top:8px;
+  transition:transform var(--transition), box-shadow var(--transition);
+}
+.login-box .btn-login-submit:hover { transform:translateY(-2px); box-shadow:0 4px 18px var(--glow); }
+.login-box .error-msg { color:var(--accent2); font-size:0.82rem; text-align:center; margin-top:12px; display:none; }
+.login-box .error-msg.show { display:block; }
+
+/* Login type switcher */
+.login-type-switcher {
+  display:flex; gap:8px; margin-bottom:24px; background:var(--input-bg); border-radius:10px; padding:4px;
+}
+.login-type-switcher button {
+  flex:1; padding:9px; border-radius:8px; font-weight:600; font-size:0.85rem;
+  color:var(--text-muted); transition:all var(--transition);
+}
+.login-type-switcher button.active {
+  background:var(--card-bg); color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ============ DASHBOARD ============ */
+.dashboard-layout {
+  display:flex; min-height:calc(100vh - 64px);
+}
+.sidebar {
+  width:230px; background:linear-gradient(180deg,#0f4c81,#0a3a63);
+  padding:24px 16px; position:fixed; top:64px; left:0; height:calc(100vh - 64px);
+  overflow-y:auto; z-index:50;
+  transition:transform var(--transition);
+}
+.sidebar .user-avatar {
+  width:60px; height:60px; border-radius:50%;
+  background:var(--accent); display:flex; align-items:center; justify-content:center;
+  margin:0 auto 10px; font-size:1.6rem; color:#fff; font-weight:700;
+}
+.sidebar .user-name { text-align:center; color:#fff; font-weight:600; font-size:0.95rem; }
+.sidebar .user-seat { text-align:center; color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:24px; }
+.sidebar-links a {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-radius:10px; color:rgba(255,255,255,0.7);
+  font-weight:500; font-size:0.9rem; margin-bottom:4px;
+  transition:background var(--transition), color var(--transition);
+}
+.sidebar-links a:hover, .sidebar-links a.active { background:rgba(255,255,255,0.12); color:#fff; }
+.sidebar-links a i { width:18px; text-align:center; }
+.sidebar .logout-btn {
+  display:flex; align-items:center; gap:10px;
+  color:rgba(255,255,255,0.55); font-size:0.85rem; padding:10px 16px;
+  margin-top:24px; border-radius:10px; width:100%;
+  transition:background var(--transition);
+}
+.sidebar .logout-btn:hover { background:rgba(255,255,255,0.1); color:#fff; }
+
+.dash-main { margin-left:230px; flex:1; padding:32px; }
+.dash-sub { display:none; animation:fadeIn .35s ease; }
+.dash-sub.active { display:block; }
+
+/* Profile card */
+.profile-card {
+  background:var(--card-bg); border-radius:var(--radius); padding:36px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+}
+.profile-header { display:flex; align-items:center; gap:24px; margin-bottom:32px; }
+.profile-avatar {
+  width:80px; height:80px; border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),#1a5276);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; color:#fff; font-weight:700; flex-shrink:0;
+}
+.profile-header h2 { font-family:'Rajdhani',sans-serif; font-size:1.7rem; color:var(--primary); }
+.profile-header p { color:var(--text-muted); font-size:0.88rem; }
+
+.profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.profile-field {
+  background:var(--input-bg); padding:16px; border-radius:12px;
+  border:1px solid var(--border);
+}
+.profile-field .pf-label { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.profile-field .pf-value { font-weight:600; color:var(--text); font-size:0.92rem; }
+
+/* Download cards */
+.dl-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+.dl-card {
+  background:var(--card-bg); border-radius:var(--radius); padding:32px 24px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+  text-align:center; transition:transform var(--transition);
+}
+.dl-card:hover { transform:translateY(-3px); }
+.dl-card .dl-icon {
+  width:56px; height:56px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px; font-size:1.4rem; color:#fff;
+}
+.dl-card h4 { font-family:'Rajdhani',sans-serif; font-size:1.1rem; color:var(--primary); margin-bottom:10px; }
+.dl-card button {
+  background:linear-gradient(135deg,var(--primary),#1a5276); color:#fff;
+  padding:9px 24px; border-radius:8px; font-weight:600; font-size:0.85rem;
+  font-family:inherit; transition:transform var(--transition);
+}
+.dl-card button:hover { transform:scale(1.04); }
+
+/* Products */
+.prod-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; }
+.prod-card {
+  background:var(--card-bg); border-radius:var(--radius); padding:28px 20px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+  text-align:center; transition:transform var(--transition);
+}
+.prod-card:hover { transform:translateY(-3px); }
+.prod-card .prod-icon { font-size:2rem; margin-bottom:12px; }
+.prod-card h4 { font-family:'Rajdhani',sans-serif; font-size:1rem; color:var(--primary); margin-bottom:6px; }
+.prod-card p { font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; }
+.prod-card .prod-price { color:var(--accent); font-weight:700; font-size:1.05rem; margin-bottom:10px; }
+.prod-card button {
+  background:var(--accent); color:#fff; padding:8px 20px; border-radius:8px;
+  font-weight:600; font-size:0.82rem; font-family:inherit;
+  transition:transform var(--transition);
+}
+.prod-card button:hover { transform:scale(1.05); }
+
+/* ============ STAFF DASHBOARD ============ */
+.staff-dash { padding:32px; }
+.staff-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:32px; }
+.staff-card {
+  background:var(--card-bg); border-radius:14px; padding:24px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+}
+.staff-card .sc-icon { font-size:1.6rem; margin-bottom:8px; }
+.staff-card .sc-num { font-family:'Rajdhani',sans-serif; font-size:1.9rem; font-weight:700; color:var(--primary); }
+.staff-card .sc-label { font-size:0.8rem; color:var(--text-muted); }
+
+.staff-table-wrap { background:var(--card-bg); border-radius:var(--radius); padding:24px; box-shadow:var(--card-shadow); border:1px solid var(--border); overflow-x:auto; }
+.staff-table { width:100%; border-collapse:collapse; }
+.staff-table th { background:var(--glow); padding:11px 14px; text-align:left; font-size:0.8rem; text-transform:uppercase; color:var(--primary); letter-spacing:0.8px; }
+.staff-table td { padding:11px 14px; border-bottom:1px solid var(--border); font-size:0.88rem; color:var(--text); }
+.staff-table tr:last-child td { border:none; }
+.badge { padding:3px 10px; border-radius:14px; font-size:0.77rem; font-weight:600; }
+.badge-green { background:#dcfce7; color:#16a34a; }
+.badge-blue { background:#dbeafe; color:#2563eb; }
+
+/* ============ ONLINE TEST PLACEHOLDER ============ */
+.test-container { max-width:600px; margin:80px auto; padding:0 20px; text-align:center; }
+.test-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:60px 36px;
+  box-shadow:var(--card-shadow); border:1px solid var(--border);
+}
+.test-box .test-icon { font-size:3.5rem; margin-bottom:20px; color:var(--primary); }
+.test-box h2 { font-family:'Rajdhani',sans-serif; font-size:1.8rem; color:var(--primary); margin-bottom:10px; }
+.test-box p { color:var(--text-muted); margin-bottom:24px; }
+.test-box .demo-btn {
+  display:inline-block; background:linear-gradient(135deg,var(--accent),#f5c842);
+  color:#fff; padding:13px 36px; border-radius:10px;
+  font-weight:700; font-size:1rem; font-family:inherit;
+  transition:transform var(--transition), box-shadow var(--transition);
+  box-shadow:0 4px 18px rgba(240,165,0,0.3);
+}
+.test-box .demo-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(240,165,0,0.45); }
+.test-box .coming-soon { margin-top:18px; font-size:0.82rem; color:var(--text-muted); font-style:italic; }
+
+/* ============ FOOTER ============ */
+footer {
+  background:linear-gradient(135deg,#0a2a4a,#0f4c81); color:rgba(255,255,255,0.7);
+  padding:48px 24px 24px;
+}
+.footer-inner { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:32px; }
+footer h4 { color:#fff; font-family:'Rajdhani',sans-serif; font-size:1.1rem; margin-bottom:14px; }
+footer p, footer a { font-size:0.85rem; line-height:1.8; color:rgba(255,255,255,0.6); }
+footer a:hover { color:var(--accent); }
+.footer-bottom { max-width:1100px; margin:32px auto 0; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; color:rgba(255,255,255,0.4); }
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:768px) {
+  .nav-links { display:none; }
+  .hamburger { display:flex; }
+  .hero h1 { font-size:2rem; }
+  .about-content { grid-template-columns:1fr; }
+  .about-content .img-placeholder { height:200px; }
+  .sidebar { transform:translateX(-230px); }
+  .sidebar.open { transform:translateX(0); }
+  .dash-main { margin-left:0; padding:20px; }
+  .login-box { padding:30px 22px; }
+  .result-box { padding:30px 20px; }
+  .mobile-menu a.nav-staff { color:var(--accent); font-weight:600; }
+}
+@media(max-width:480px) {
+  .hero h1 { font-size:1.6rem; }
+  .hero-btns { flex-direction:column; align-items:center; }
+  .section { padding:52px 16px; }
+  .card-grid { grid-template-columns:1fr; }
+  .profile-grid { grid-template-columns:1fr 1fr; }
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
+
+/* ============ LOADING SPINNER ============ */
+.spinner {
+  width:36px; height:36px; border:3px solid var(--border);
+  border-top-color:var(--primary); border-radius:50%;
+  animation:spin .6s linear infinite; margin:0 auto;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* Floating action on mobile sidebar toggle */
+.fab-sidebar {
+  display:none; position:fixed; bottom:24px; left:24px; z-index:100;
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),#1a5276); color:#fff;
+  font-size:1.3rem; box-shadow:0 4px 18px var(--glow);
+  align-items:center; justify-content:center;
+  transition:transform var(--transition);
+}
+.fab-sidebar:hover { transform:scale(1.08); }
+@media(max-width:768px) { .fab-sidebar { display:flex; } }
+
+</style>
+</head>
+<body>
+
+<!-- =============== NAVBAR =============== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo" onclick="showPage('home')">
+      <i class="fas fa-graduation-cap"></i>
+      Scholar<span>Gate</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#" class="active" onclick="showPage('home',this)">Home</a>
+      <a href="#" onclick="showPage('about',this)">About Us</a>
+      <a href="#" onclick="showPage('competition',this)">Competition</a>
+      <a href="#" onclick="showPage('buyonline',this)">Buy Online</a>
+      <a href="#" onclick="showPage('onlinetest',this)">Online Test</a>
+      <a href="#" onclick="showPage('results',this)">Result</a>
+      <a href="#" class="btn-login" onclick="showPage('login',this)">Login</a>
+      <div class="dark-toggle" id="darkToggle" onclick="toggleDark()">
+        <div class="knob"><i class="fas fa-moon"></i></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="dark-toggle" id="darkToggleMob" onclick="toggleDark()" style="display:none;">
+        <div class="knob"><i class="fas fa-moon"></i></div>
+      </div>
+      <div class="hamburger" id="hamburger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="showPage('home');closeMobile()">Home</a>
+  <a href="#" onclick="showPage('about');closeMobile()">About Us</a>
+  <a href="#" onclick="showPage('competition');closeMobile()">Competition</a>
+  <a href="#" onclick="showPage('buyonline');closeMobile()">Buy Online</a>
+  <a href="#" onclick="showPage('onlinetest');closeMobile()">Online Test</a>
+  <a href="#" onclick="showPage('results');closeMobile()">Result</a>
+  <a href="#" onclick="showPage('login');closeMobile()">Login</a>
+  <a href="#" class="nav-staff" onclick="showPage('login');closeMobile();switchLoginType('staff')">Staff Login</a>
+</div>
+
+<!-- =============== HOME PAGE =============== -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge"><i class="fas fa-star"></i> &nbsp; Scholarship Exam 2025</div>
+      <h1>Unlock Your Future with <span>ScholarGate</span></h1>
+      <p>India's leading scholarship assessment platform for students from JRK to Class 7. Compete, learn, and win life-changing scholarships.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('buyonline')"><i class="fas fa-rocket"></i> &nbsp; Register Now</button>
+        <button class="btn-secondary" onclick="showPage('competition')"><i class="fas fa-trophy"></i> &nbsp; View Competition</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num">12,500+</div><div class="label">Students Registered</div></div>
+        <div class="hero-stat"><div class="num">₹25L+</div><div class="label">Prize Money</div></div>
+        <div class="hero-stat"><div class="num">480+</div><div class="label">Schools</div></div>
+        <div class="hero-stat"><div class="num">100%</div><div class="label">Transparency</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why ScholarGate -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-title">
+        <div class="tag"><i class="fas fa-bolt"></i> Why ScholarGate</div>
+        <h2>Built for Bright Minds</h2>
+        <p>We believe every deserving student should get access to quality education regardless of background.</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon" style="background:#eef2ff;"><i class="fas fa-book-open" style="color:#6366f1;"></i></div>
+          <h3>Fair Assessment</h3>
+          <p>Transparent and unbiased examination conducted by seasoned education professionals.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#fef3c7;"><i class="fas fa-medal" style="color:#f59e0b;"></i></div>
+          <h3>Big Prizes</h3>
+          <p>Win scholarships, medals, certificates, and prize money that shape your academic journey.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#ecfdf5;"><i class="fas fa-shield-alt" style="color:#10b981;"></i></div>
+          <h3>Verified Results</h3>
+          <p>Results are verified and published with full marks breakdown and ranking transparency.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#fee2e2;"><i class="fas fa-users" style="color:#ef4444;"></i></div>
+          <h3>All India</h3>
+          <p>Open to students from JRK to Class 7 across hundreds of schools nationwide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" style="background:var(--card-bg); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="section-inner">
+      <div class="section-title">
+        <div class="tag"><i class="fas fa-list-alt"></i> Process</div>
+        <h2>How It Works</h2>
+      </div>
+      <div class="card-grid">
+        <div class="card" style="border-top:3px solid #6366f1;">
+          <div class="card-icon" style="background:#eef2ff;"><i class="fas fa-1" style="color:#6366f1; font-size:1.2rem;"></i></div>
+          <h3>Register Online</h3>
+          <p>Sign up through your school and get your unique Seat Number and credentials.</p>
+        </div>
+        <div class="card" style="border-top:3px solid #f59e0b;">
+          <div class="card-icon" style="background:#fef3c7;"><i class="fas fa-2" style="color:#f59e0b; font-size:1.2rem;"></i></div>
+          <h3>Appear for Exam</h3>
+          <p>Sit for the scholarship exam at your designated center on the scheduled date.</p>
+        </div>
+        <div class="card" style="border-top:3px solid #10b981;">
+          <div class="card-icon" style="background:#ecfdf5;"><i class="fas fa-3" style="color:#10b981; font-size:1.2rem;"></i></div>
+          <h3>Get Results</h3>
+          <p>Check your results online using your seat number. Download marksheet instantly.</p>
+        </div>
+        <div class="card" style="border-top:3px solid #ef4444;">
+          <div class="card-icon" style="background:#fee2e2;"><i class="fas fa-4" style="color:#ef4444; font-size:1.2rem;"></i></div>
+          <h3>Win Scholarship</h3>
+          <p>Top students receive scholarships, medals, and certificates directly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="section-inner" style="text-align:center;">
+      <div style="background:linear-gradient(135deg,var(--primary),#1a5276); border-radius:20px; padding:64px 32px; position:relative; overflow:hidden;">
+        <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+        <div style="position:absolute;bottom:-30px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(240,165,0,0.08);"></div>
+        <div style="position:relative;z-index:2;">
+          <h2 style="font-family:'Rajdhani',sans-serif;font-size:2.1rem;color:#fff;margin-bottom:12px;">Ready to Begin Your Journey?</h2>
+          <p style="color:rgba(255,255,255,0.7);margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto;">Join thousands of students already competing for scholarships. Your future starts here.</p>
+          <button class="btn-primary" onclick="showPage('buyonline')"><i class="fas fa-rocket"></i> &nbsp; Register Today</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <h4><i class="fas fa-graduation-cap"></i> ScholarGate</h4>
+        <p>Empowering students through fair scholarship assessments. Building brighter futures since 2025.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="#" onclick="showPage('home')" style="display:block;">Home</a>
+        <a href="#" onclick="showPage('about')" style="display:block;">About Us</a>
+        <a href="#" onclick="showPage('competition')" style="display:block;">Competition</a>
+        <a href="#" onclick="showPage('results')" style="display:block;">Results</a>
+      </div>
+      <div>
+        <h4>Contact Us</h4>
+        <p><i class="fas fa-envelope"></i> &nbsp; info@scholergate.com</p>
+        <p><i class="fas fa-phone"></i> &nbsp; +91 98765 43210</p>
+        <p><i class="fas fa-map-marker-alt"></i> &nbsp; Mumbai, Maharashtra</p>
+      </div>
+      <div>
+        <h4>Follow Us</h4>
+        <div style="display:flex;gap:12px;margin-top:4px;">
+          <a href="#" style="font-size:1.1rem;"><i class="fab fa-facebook"></i></a>
+          <a href="#" style="font-size:1.1rem;"><i class="fab fa-twitter"></i></a>
+          <a href="#" style="font-size:1.1rem;"><i class="fab fa-instagram"></i></a>
+          <a href="#" style="font-size:1.1rem;"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 ScholarGate Assessment. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- =============== ABOUT PAGE =============== -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="tag" style="background:rgba(240,165,0,0.2);color:var(--accent);"><i class="fas fa-info-circle"></i> About Us</div>
+    <h1>Who We Are</h1>
+    <p>Dedicated to building a fair and transparent scholarship ecosystem for every student in India.</p>
+  </div>
+  <section class="section">
+    <div class="section-inner">
+      <div class="about-content">
+        <div class="img-placeholder"><i class="fas fa-building"></i></div>
+        <div class="text">
+          <h3>ScholarGate Assessment</h3>
+          <p>ScholarGate Assessment is India's most trusted scholarship examination platform. Founded in 2025, our mission is to identify and support bright students from JRK to Class 7 through fair, transparent, and merit-based scholarship exams.</p>
+          <p>We work closely with schools, education boards, and scholarship sponsors to ensure every deserving student gets a chance to shine. Our state-of-the-art platform offers seamless registration, secure examination, instant results, and easy certificate downloads.</p>
+          <div class="about-values">
+            <div class="about-value"><i class="fas fa-check-circle"></i> <span>Transparency</span></div>
+            <div class="about-value"><i class="fas fa-heart"></i> <span>Student First</span></div>
+            <div class="about-value"><i class="fas fa-shield-alt"></i> <span>Integrity</span></div>
+            <div class="about-value"><i class="fas fa-star"></i> <span>Excellence</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team / Stats -->
+  <section class="section" style="background:var(--card-bg);border-top:1px solid var(--border);">
+    <div class="section-inner">
+      <div class="section-title">
+        <div class="tag"><i class="fas fa-chart-bar"></i> Our Impact</div>
+        <h2>Numbers That Matter</h2>
+      </div>
+      <div class="card-grid">
+        <div class="card"><div class="card-icon" style="background:#eef2ff;"><i class="fas fa-users" style="color:#6366f1;"></i></div><h3>12,500+</h3><p>Students supported and empowered through our scholarship programs across India.</p></div>
+        <div class="card"><div class="card-icon" style="background:#fef3c7;"><i class="fas fa-school" style="color:#f59e0b;"></i></div><h3>480+ Schools</h3><p>Partner schools across multiple states participating in our annual exams.</p></div>
+        <div class="card"><div class="card-icon" style="background:#ecfdf5;"><i class="fas fa-trophy" style="color:#10b981;"></i></div><h3>₹25 Lakh+</h3><p>Total prize money and scholarships distributed to meritorious students.</p></div>
+        <div class="card"><div class="card-icon" style="background:#fee2e2;"><i class="fas fa-certificate" style="color:#ef4444;"></i></div><h3>1000+ Certs</h3><p>Certificates and medals awarded to top-performing students each year.</p></div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="footer-inner">
+      <div><h4><i class="fas fa-graduation-cap"></i> ScholarGate</h4><p>Empowering students through fair scholarship assessments.</p></div>
+      <div><h4>Quick Links</h4><a href="#" onclick="showPage('home')" style="display:block;">Home</a><a href="#" onclick="showPage('competition')" style="display:block;">Competition</a><a href="#" onclick="showPage('results')" style="display:block;">Results</a></div>
+      <div><h4>Contact</h4><p><i class="fas fa-envelope"></i> info@scholergate.com</p><p><i class="fas fa-phone"></i> +91 98765 43210</p></div>
+    </div>
+    <div class="footer-bottom">© 2025 ScholarGate Assessment. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- =============== COMPETITION PAGE =============== -->
+<div id="page-competition" class="page">
+  <div class="about-hero">
+    <div class="tag" style="background:rgba(240,165,0,0.2);color:var(--accent);"><i class="fas fa-trophy"></i> Competition</div>
+    <h1>ScholarGate Maths Exam 2025</h1>
+    <p>Everything you need to know about our scholarship examination — rules, prizes, medals & more.</p>
+  </div>
+  <section class="section">
+    <div class="section-inner">
+      <!-- Prize Cards -->
+      <div class="section-title">
+        <div class="tag"><i class="fas fa-gift"></i> Prizes & Awards</div>
+        <h2>What's at Stake</h2>
+      </div>
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="comp-card-header"><i class="fas fa-medal" style="font-size:1.8rem;color:#ffd700;"></i><br/><h3>1st Place</h3><div class="price">₹50,000</div></div>
+          <div class="comp-card-body"><ul>
+            <li><i class="fas fa-check"></i> Gold Medal</li>
+            <li><i class="fas fa-check"></i> Certificate of Excellence</li>
+            <li><i class="fas fa-check"></i> Full Scholarship for 1 Year</li>
+            <li><i class="fas fa-check"></i> Laptop Worth ₹40,000</li>
+          </ul></div>
+        </div>
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:linear-gradient(135deg,#475569,#334155);"><i class="fas fa-medal" style="font-size:1.8rem;color:#c0c0c0;"></i><br/><h3>2nd Place</h3><div class="price">₹30,000</div></div>
+          <div class="comp-card-body"><ul>
+            <li><i class="fas fa-check"></i> Silver Medal</li>
+            <li><i class="fas fa-check"></i> Certificate of Merit</li>
+            <li><i class="fas fa-check"></i> Scholarship for 6 Months</li>
+            <li><i class="fas fa-check"></i> Book Kit Worth ₹5,000</li>
+          </ul></div>
+        </div>
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:linear-gradient(135deg,#92400e,#78350f);"><i class="fas fa-medal" style="font-size:1.8rem;color:#cd7f32;"></i><br/><h3>3rd Place</h3><div class="price">₹15,000</div></div>
+          <div class="comp-card-body"><ul>
+            <li><i class="fas fa-check"></i> Bronze Medal</li>
+            <li><i class="fas fa-check"></i> Certificate of Merit</li>
+            <li><i class="fas fa-check"></i> Scholarship for 3 Months</li>
+            <li><i class="fas fa-check"></i> Book Kit Worth ₹3,000</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <!-- Rules -->
+      <div class="rules-box">
+        <h3><i class="fas fa-list-alt" style="color:var(--accent);margin-right:10px;"></i>Examination Rules</h3>
+        <ol>
+          <li><span>01.</span> All students from JRK to Class 7 are eligible to participate.</li>
+          <li><span>02.</span> Registration must be completed before the deadline. Late registrations will not be accepted.</li>
+          <li><span>03.</span> Students must bring their Admit Card (Hall Ticket) and school ID to the exam center.</li>
+          <li><span>04.</span> The exam is of <strong>60 minutes</strong> duration with <strong>100 marks</strong> total.</li>
+          <li><span>05.</span> Only blue or black pen is allowed. No calculators or electronic devices permitted.</li>
+          <li><span>06.</span> Students must arrive 15 minutes before the exam starts.</li>
+          <li><span>07.</span> Any form of cheating will result in immediate disqualification.</li>
+          <li><span>08.</span> Results will be declared within 2 weeks after the exam date.</li>
+          <li><span>09.</span> Top 3 students in each class will receive medals and prize money.</li>
+          <li><span>10.</span> Certificates will be issued to all participants.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="footer-inner">
+      <div><h4><i class="fas fa-graduation-cap"></i> ScholarGate</h4><p>Empowering students through fair scholarship assessments.</p></div>
+      <div><h4>Quick Links</h4><a href="#" onclick="showPage('home')" style="display:block;">Home</a><a href="#" onclick="showPage('buyonline')" style="display:block;">Buy Online</a><a href="#" onclick="showPage('results')" style="display:block;">Results</a></div>
+      <div><h4>Contact</h4><p><i class="fas fa-envelope"></i> info@scholergate.com</p><p><i class="fas fa-phone"></i> +91 98765 43210</p></div>
+    </div>
+    <div class="footer-bottom">© 2025 ScholarGate Assessment. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- =============== BUY ONLINE PAGE =============== -->
+<div id="page-buyonline" class="page">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-icon"><i class="fas fa-shopping-cart"></i></div>
+      <h2>Buy Online</h2>
+      <p class="sub">Login to purchase your exam registration</p>
+      <div class="input-group">
+        <label><i class="fas fa-id-card"></i> Seat Number</label>
+        <input type="text" placeholder="Enter your Seat No." id="buySeatNo"/>
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-lock"></i> Password</label>
+        <input type="password" placeholder="Enter your Password" id="buyPassword"/>
+      </div>
+      <button class="btn-login-submit" onclick="handleBuyLogin()">Proceed to Buy</button>
+      <div class="error-msg" id="buyError">Invalid Seat Number or Password. Please try again.</div>
+      <p style="text-align:center;margin-top:16px;font-size:0.82rem;color:var(--text-muted);">Don't have credentials? Contact your school administration.</p>
+    </div>
+  </div>
+</div>
+
+<!-- =============== ONLINE TEST PAGE =============== -->
+<div id="page-onlinetest" class="page">
+  <div class="test-container">
+    <div class="test-box">
+      <div class="test-icon"><i class="fas fa-laptop-code"></i></div>
+      <h2>Online Test</h2>
+      <p>Practice and prepare for your scholarship exam with our interactive demo test. The full test module is coming soon!</p>
+      <button class="demo-btn" onclick="alert('🎯 Demo Test will be available soon!\n\nStay tuned — we are building an amazing interactive test experience for you.')">
+        <i class="fas fa-play-circle"></i> &nbsp; Start Demo Test
+      </button>
+      <p class="coming-soon"><i class="fas fa-clock"></i> Full test module — coming soon</p>
+    </div>
+  </div>
+</div>
+
+<!-- =============== RESULTS PAGE =============== -->
+<div id="page-results" class="page">
+  <div class="result-container">
+    <div class="result-box">
+      <div style="font-size:2.8rem;margin-bottom:12px;color:var(--primary);"><i class="fas fa-file-alt"></i></div>
+      <h2>Check Your Result</h2>
+      <p>Enter your Seat Number below to view your exam result</p>
+      <input type="text" class="result-input" id="resultSeatInput" placeholder="Seat Number" onkeydown="if(event.key==='Enter')getResult()"/>
+      <button class="btn-get-result" onclick="getResult()"><i class="fas fa-search"></i> &nbsp; Get Result</button>
+
+      <!-- Result Card (shown after search) -->
+      <div class="result-card" id="resultCard">
+        <div class="student-info">
+          <div class="seat">Seat No: <strong id="resSeat">—</strong></div>
+          <h3 id="resName">—</h3>
+          <div class="school" id="resSchool">—</div>
+        </div>
+        <table class="result-table">
+          <tr>
+            <th colspan="2" id="resExamTitle">ScholarGate Maths Exam – 2025</th>
+          </tr>
+          <tr>
+            <td class="label">Max Marks</td>
+            <td class="value">100</td>
+          </tr>
+          <tr>
+            <td class="label">Marks Obtained</td>
+            <td class="value" id="resMarks">—</td>
+          </tr>
+          <tr>
+            <td class="label">Rank</td>
+            <td class="value"><span class="rank-badge" id="resRank">—</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="resultNotFound" style="display:none;text-align:center;margin-top:20px;color:var(--accent2);font-weight:600;"><i class="fas fa-exclamation-circle"></i> No result found for this seat number.</div>
+  </div>
+</div>
+
+<!-- =============== LOGIN PAGE =============== -->
+<div id="page-login" class="page">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-type-switcher">
+        <button class="active" id="btnStudent" onclick="switchLoginType('student')">Student</button>
+        <button id="btnStaff" onclick="switchLoginType('staff')">Staff</button>
+      </div>
+
+      <!-- Student Login -->
+      <div id="loginStudent">
+        <div class="login-icon"><i class="fas fa-user-graduate"></i></div>
+        <h2>Student Login</h2>
+        <p class="sub">Enter your credentials to access your dashboard</p>
+        <div class="input-group">
+          <label><i class="fas fa-id-card"></i> Seat Number</label>
+          <input type="text" placeholder="Enter Seat Number" id="studentSeatNo"/>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" placeholder="Enter Password" id="studentPass"/>
+        </div>
+        <button class="btn-login-submit" onclick="studentLogin()">Login</button>
+        <div class="error-msg" id="studentError">Invalid Seat Number or Password.</div>
+      </div>
+
+      <!-- Staff Login -->
+      <div id="loginStaff" style="display:none;">
+        <div class="login-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-user-tie"></i></div>
+        <h2>Staff Login</h2>
+        <p class="sub">Admin / Staff access</p>
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Username</label>
+          <input type="text" placeholder="Enter Username" id="staffUser"/>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" placeholder="Enter Password" id="staffPass"/>
+        </div>
+        <button class="btn-login-submit" onclick="staffLogin()">Staff Login</button>
+        <div class="error-msg" id="staffError">Invalid Username or Password.</div>
+        <p style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--text-muted);">Staff credentials are provided by administration only.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== STUDENT DASHBOARD =============== -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="user-avatar" id="dashAvatar">S</div>
+      <div class="user-name" id="dashName">Student Name</div>
+      <div class="user-seat" id="dashSeat">Seat: —</div>
+      <div class="sidebar-links">
+        <a href="#" class="active" onclick="showDash('profile',this)"><i class="fas fa-user"></i> My Profile</a>
+        <a href="#" onclick="showDash('downloads',this)"><i class="fas fa-download"></i> Downloads</a>
+        <a href="#" onclick="showDash('products',this)"><i class="fas fa-box"></i> Product for You</a>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dash-main">
+      <!-- Profile -->
+      <div class="dash-sub active" id="dash-profile">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profAvatar">S</div>
+            <div>
+              <h2 id="profName">Student Name</h2>
+              <p id="profSeat">Seat Number</p>
+            </div>
+          </div>
+          <div class="profile-grid" id="profileGrid">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Downloads -->
+      <div class="dash-sub" id="dash-downloads">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;color:var(--primary);margin-bottom:20px;"><i class="fas fa-download"></i> Downloads</h2>
+        <div class="dl-grid">
+          <div class="dl-card">
+            <div class="dl-icon" style="background:linear-gradient(135deg,#6366f1,#4f46e5);"><i class="fas fa-file-alt"></i></div>
+            <h4>Hall Ticket</h4>
+            <button onclick="alert('🎫 Hall Ticket downloaded successfully!')"><i class="fas fa-download"></i> Download</button>
+          </div>
+          <div class="dl-card">
+            <div class="dl-icon" style="background:linear-gradient(135deg,#10b981,#059669);"><i class="fas fa-certificate"></i></div>
+            <h4>Certificate</h4>
+            <button onclick="alert('🏆 Certificate downloaded successfully!')"><i class="fas fa-download"></i> Download</button>
+          </div>
+          <div class="dl-card">
+            <div class="dl-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-file-invoice"></i></div>
+            <h4>Marksheet</h4>
+            <button onclick="alert('📄 Marksheet downloaded successfully!')"><i class="fas fa-download"></i> Download</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div class="dash-sub" id="dash-products">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;color:var(--primary);margin-bottom:20px;"><i class="fas fa-box"></i> Products For You</h2>
+        <div class="prod-grid">
+          <div class="prod-card">
+            <div class="prod-icon">📚</div>
+            <h4>Study Kit</h4>
+            <p>Complete study material for exam prep</p>
+            <div class="prod-price">₹499</div>
+            <button onclick="alert('📦 Study Kit added to cart!')">Buy Now</button>
+          </div>
+          <div class="prod-card">
+            <div class="prod-icon">🎯</div>
+            <h4>Practice Tests</h4>
+            <p>50+ mock tests with solutions</p>
+            <div class="prod-price">₹299</div>
+            <button onclick="alert('🎯 Practice Tests added to cart!')">Buy Now</button>
+          </div>
+          <div class="prod-card">
+            <div class="prod-icon">🏆</div>
+            <h4>Premium Coaching</h4>
+            <p>1-on-1 online coaching sessions</p>
+            <div class="prod-price">₹1,499</div>
+            <button onclick="alert('🏆 Premium Coaching added to cart!')">Buy Now</button>
+          </div>
+          <div class="prod-card">
+            <div class="prod-icon">📖</div>
+            <h4>E-Book Bundle</h4>
+            <p>Digital books for all subjects</p>
+            <div class="prod-price">₹199</div>
+            <button onclick="alert('📖 E-Book Bundle added to cart!')">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile sidebar toggle -->
+  <button class="fab-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">
+    <i class="fas fa-bars"></i>
+  </button>
+</div>
+
+<!-- =============== STAFF DASHBOARD =============== -->
+<div id="page-staff" class="page">
+  <div style="background:linear-gradient(135deg,#0f4c81,#1a5276);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:64px;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;"><i class="fas fa-user-tie"></i></div>
+      <div><div style="color:#fff;font-weight:600;font-size:0.95rem;">Staff Dashboard</div><div style="color:rgba(255,255,255,0.5);font-size:0.78rem;">ScholarGate Admin</div></div>
+    </div>
+    <button onclick="logout()" style="background:rgba(255,255,255,0.12);color:#fff;padding:8px 18px;border-radius:8px;font-weight:600;font-size:0.85rem;font-family:inherit;transition:background .3s;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+  <div class="staff-dash">
+    <div class="staff-cards">
+      <div class="staff-card"><div class="sc-icon">👨‍🎓</div><div class="sc-num">12,500</div><div class="sc-label">Total Students</div></div>
+      <div class="staff-card"><div class="sc-icon">🏫</div><div class="sc-num">480</div><div class="sc-label">Schools</div></div>
+      <div class="staff-card"><div class="sc-icon">✅</div><div class="sc-num">11,890</div><div class="sc-label">Appeared</div></div>
+      <div class="staff-card"><div class="sc-icon">📄</div><div class="sc-num">12,500</div><div class="sc-label">Results Published</div></div>
+    </div>
+    <div class="staff-table-wrap">
+      <h3 style="font-family:'Rajdhani',sans-serif;color:var(--primary);margin-bottom:16px;font-size:1.2rem;"><i class="fas fa-list"></i> Recent Students</h3>
+      <table class="staff-table">
+        <thead>
+          <tr><th>Seat No</th><th>Name</th><th>School</th><th>Class</th><th>Status</th><th>Marks</th></tr>
+        </thead>
+        <tbody id="staffTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =============== JAVASCRIPT / DATABASE =============== -->
+<script>
+// ========== MOCK DATABASE ==========
+const DB = {
+  students: [
+    { seat:"SG-2025-001", name:"Rahul Sharma", school:"DAV Public School", mobile1:"9876543210", mobile2:"9876543211", email1:"rahul@email.com", email2:"rahul2@email.com", address:"123 MG Road", city:"Mumbai", state:"Maharashtra", country:"India", dob:"15-03-2015", gender:"Male", class:"5th", division:"A", marks:87 },
+    { seat:"SG-2025-002", name:"Priya Mehta", school:"Kendriya Vidyalaya", mobile1:"8765432109", mobile2:"8765432100", email1:"priya@email.com", email2:"priya2@email.com", address:"456 Park Ave", city:"Delhi", state:"Delhi", country:"India", dob:"22-07-2014", gender:"Female", class:"6th", division:"B", marks:95 },
+    { seat:"SG-2025-003", name:"Arjun Patel", school:"Ryan International", mobile1:"7654321098", mobile2:"7654321099", email1:"arjun@email.com", email2:"arjun2@email.com", address:"789 Lake St", city:"Ahmedabad", state:"Gujarat", country:"India", dob:"10-11-2015", gender:"Male", class:"4th", division:"A", marks:78 },
+    { seat:"SG-2025-004", name:"Sneha Rao", school:"St. Mary's School", mobile1:"6543210987", mobile2:"6543210988", email1:"sneha@email.com", email2:"sneha2@email.com", address:"321 Hill Rd", city:"Bangalore", state:"Karnataka", country:"India", dob:"05-01-2013", gender:"Female", class:"7th", division:"C", marks:91 },
+    { seat:"SG-2025-005", name:"Vikram Nair", school:"Amity School", mobile1:"5432109876", mobile2:"5432109877", email1:"vikram@email.com", email2:"vikram2@email.com", address:"654 River Ln", city:"Chennai", state:"Tamil Nadu", country:"India", dob:"18-09-2015", gender:"Male", class:"3rd", division:"B", marks:82 },
+    { seat:"SG-2025-006", name:"Ananya Das", school:"Greenfield Academy", mobile1:"4321098765", mobile2:"4321098766", email1:"ananya@email.com", email2:"ananya2@email.com", address:"987 Elm St", city:"Kolkata", state:"West Bengal", country:"India", dob:"27-04-2014", gender:"Female", class:"5th", division:"A", marks:93 },
+  ],
+  staff: { username:"admin", password:"staff123" }
+};
+
+// Passwords: seat number itself is the password for simplicity (demo)
+// Staff: admin / staff123
+
+let currentUser = null;
+let currentRole = null; // 'student' or 'staff'
+
+// ========== PAGE NAVIGATION ==========
+function showPage(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  // Update exam title year dynamically
+  const year = new Date().getFullYear();
+  const el2 = document.getElementById('resExamTitle');
+  if (el2) el2.textContent = 'ScholarGate Maths Exam – ' + year;
+}
+
+// ========== DARK MODE ==========
+function toggleDark() {
+  const body = document.body;
+  const t1 = document.getElementById('darkToggle');
+  const t2 = document.getElementById('darkToggleMob');
+  if (body.getAttribute('data-theme') === 'dark') {
+    body.removeAttribute('data-theme');
+    t1.classList.remove('on'); t2.classList.remove('on');
+    t1.querySelector('.knob').innerHTML='<i class="fas fa-moon"></i>';
+    t2.querySelector('.knob').innerHTML='<i class="fas fa-moon"></i>';
+  } else {
+    body.setAttribute('data-theme','dark');
+    t1.classList.add('on'); t2.classList.add('on');
+    t1.querySelector('.knob').innerHTML='<i class="fas fa-sun"></i>';
+    t2.querySelector('.knob').innerHTML='<i class="fas fa-sun"></i>';
+  }
+}
+
+// ========== MOBILE MENU ==========
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ========== LOGIN TYPE SWITCHER ==========
+function switchLoginType(type) {
+  document.getElementById('loginStudent').style.display = type==='student'?'block':'none';
+  document.getElementById('loginStaff').style.display = type==='staff'?'block':'none';
+  document.getElementById('btnStudent').classList.toggle('active', type==='student');
+  document.getElementById('btnStaff').classList.toggle('active', type==='staff');
+}
+
+// ========== STUDENT LOGIN ==========
+function studentLogin() {
+  const seat = document.getElementById('studentSeatNo').value.trim();
+  const pass = document.getElementById('studentPass').value.trim();
+  const errEl = document.getElementById('studentError');
+  errEl.classList.remove('show');
+
+  const student = DB.students.find(s => s.seat === seat);
+  // Password = seat number (demo)
+  if (student && pass === seat) {
+    currentUser = student;
+    currentRole = 'student';
+    renderDashboard(student);
+    showPage('dashboard');
+  } else {
+    errEl.classList.add('show');
+  }
+}
+
+// ========== STAFF LOGIN ==========
+function staffLogin() {
+  const user = document.getElementById('staffUser').value.trim();
+  const pass = document.getElementById('staffPass').value.trim();
+  const errEl = document.getElementById('staffError');
+  errEl.classList.remove('show');
+
+  if (user === DB.staff.username && pass === DB.staff.password) {
+    currentRole = 'staff';
+    renderStaffDashboard();
+    showPage('staff');
+  } else {
+    errEl.classList.add('show');
+  }
+}
+
+// ========== BUY ONLINE LOGIN ==========
+function handleBuyLogin() {
+  const seat = document.getElementById('buySeatNo').value.trim();
+  const pass = document.getElementById('buyPassword').value.trim();
+  const errEl = document.getElementById('buyError');
+  errEl.classList.remove('show');
+
+  const student = DB.students.find(s => s.seat === seat);
+  if (student && pass === seat) {
+    currentUser = student;
+    currentRole = 'student';
+    renderDashboard(student);
+    showPage('dashboard');
+    showDash('products');
+  } else {
+    errEl.classList.add('show');
+  }
+}
+
+// ========== RENDER STUDENT DASHBOARD ==========
+function renderDashboard(s) {
+  const init = s.name.charAt(0).toUpperCase();
+  document.getElementById('dashAvatar').textContent = init;
+  document.getElementById('dashName').textContent = s.name;
+  document.getElementById('dashSeat').textContent = 'Seat: ' + s.seat;
+  document.getElementById('profAvatar').textContent = init;
+  document.getElementById('profName').textContent = s.name;
+  document.getElementById('profSeat').textContent = s.seat;
+
+  const fields = [
+    {l:'Name', v:s.name}, {l:'Seat Number', v:s.seat},
+    {l:'Mobile 1', v:s.mobile1}, {l:'Mobile 2', v:s.mobile2},
+    {l:'Email 1', v:s.email1}, {l:'Email 2', v:s.email2},
+    {l:'Address', v:s.address}, {l:'City', v:s.city},
+    {l:'State', v:s.state}, {l:'Country', v:s.country},
+    {l:'Date of Birth', v:s.dob}, {l:'Gender', v:s.gender},
+    {l:'Class', v:s.class}, {l:'Division', v:s.division},
+    {l:'School Name', v:s.school}
+  ];
+  document.getElementById('profileGrid').innerHTML = fields.map(f =>
+    `<div class="profile-field"><div class="pf-label">${f.l}</div><div class="pf-value">${f.v}</div></div>`
+  ).join('');
+
+  // Show profile by default
+  showDash('profile');
+}
+
+// ========== DASHBOARD SUB-NAV ==========
+function showDash(sub, el) {
+  document.querySelectorAll('.dash-sub').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.sidebar-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('dash-' + sub).classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    // auto-highlight
+    document.querySelectorAll('.sidebar-links a').forEach(a => {
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').includes(sub)) a.classList.add('active');
+    });
+  }
+}
+
+// ========== RESULTS ==========
+function getResult() {
+  const seat = document.getElementById('resultSeatInput').value.trim();
+  const card = document.getElementById('resultCard');
+  const notFound = document.getElementById('resultNotFound');
+  card.classList.remove('show');
+  notFound.style.display = 'none';
+
+  if (!seat) return;
+
+  const student = DB.students.find(s => s.seat === seat);
+  if (student) {
+    // Calculate rank based on marks (among all students)
+    const sorted = [...DB.students].sort((a,b) => b.marks - a.marks);
+    const rank = sorted.findIndex(s => s.seat === student.seat) + 1;
+    const year = new Date().getFullYear();
+
+    document.getElementById('resSeat').textContent = student.seat;
+    document.getElementById('resName').textContent = student.name;
+    document.getElementById('resSchool').textContent = student.school;
+    document.getElementById('resExamTitle').textContent = 'ScholarGate Maths Exam – ' + year;
+    document.getElementById('resMarks').textContent = student.marks + ' / 100';
+    document.getElementById('resRank').textContent = '#' + rank;
+
+    card.classList.add('show');
+  } else {
+    notFound.style.display = 'block';
+  }
+}
+
+// ========== STAFF DASHBOARD ==========
+function renderStaffDashboard() {
+  const tbody = document.getElementById('staffTableBody');
+  tbody.innerHTML = DB.students.map(s => {
+    const sorted = [...DB.students].sort((a,b) => b.marks - a.marks);
+    const rank = sorted.findIndex(st => st.seat === s.seat) + 1;
+    return `<tr>
+      <td>${s.seat}</td>
+      <td>${s.name}</td>
+      <td>${s.school}</td>
+      <td>${s.class}</td>
+      <td><span class="badge ${rank<=3?'badge-green':'badge-blue'}">${rank<=3?'Top '+rank:'Appeared'}</span></td>
+      <td><strong>${s.marks}</strong></td>
+    </tr>`;
+  }).join('');
+}
+
+// ========== LOGOUT ==========
+function logout() {
+  currentUser = null;
+  currentRole = null;
+  document.getElementById('studentSeatNo').value='';
+  document.getElementById('studentPass').value='';
+  document.getElementById('staffUser').value='';
+  document.getElementById('staffPass').value='';
+  showPage('home');
+}
+
+// ========== INIT ==========
+window.addEventListener('DOMContentLoaded', () => {
+  // Mobile dark toggle visibility
+  if (window.innerWidth <= 768) {
+    document.getElementById('darkToggleMob').style.display = 'flex';
+  }
+  window.addEventListener('resize', () => {
+    document.getElementById('darkToggleMob').style.display = window.innerWidth<=768?'flex':'none';
+  });
+});
+</script>
+</body>
+</html>
